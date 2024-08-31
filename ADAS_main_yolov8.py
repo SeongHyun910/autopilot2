@@ -52,19 +52,20 @@ class FindLaneLines :
         cv2.imshow("out_img",out_img)
         time1 = time.perf_counter_ns()
         img = self.transform.forward(img)
+        M_inv = self.transform.M_inv
         cv2.imshow("self.transform.forward(img)", img)
         # print(f"self.transform.forward(img): {self.transform.forward(img)}")
         time2 = time.perf_counter_ns()
         img = self.thresholding.forward(img)
         # print(f"self.thresholding.forward(img):{self.thresholding.forward(img).shape}")
         time3 = time.perf_counter_ns()
-        img, road_info = self.lanelines.forward(img)
+        img, road_info, left_line, right_line, y = self.lanelines.forward(img)
         time4 = time.perf_counter_ns()
         img = self.transform.backward(img)
         time5 = time.perf_counter_ns()
         out_img = cv2.addWeighted(out_img, 1, img, 0.6, 0)
         # print(f"time1: {check_time(time1, time2)}ms, time2: {check_time(time2, time3)}ms, time3: {check_time(time3, time4)}ms, time4: {check_time(time4, time5)}ms")
-        return out_img, road_info
+        return out_img, road_info, left_line, right_line, M_inv, y
 
     def process_image(self, img_path):
         cap = cv2.VideoCapture(img_path)
@@ -117,7 +118,9 @@ class FindLaneLines :
             if elapsed_time < video_frame_interval:
                 time.sleep(video_frame_interval - elapsed_time)
 
-            lane_img, road_info = self.forward(lane_img)
+            lane_img, road_info, left_line, right_line, M_inv, y = self.forward(lane_img)
+            # 동준! 펴져있는 차선 정보 들고오는 것 까지는 완료했다! getperspectivepoint로 
+            # left_line, right_line, M_inv, y받아오는것부터 하면 됨!
             time3 = time.perf_counter_ns()
             result = cv2.addWeighted(lane_img, 0.5, yolo_img, 0.5, 0)
             # 프레임 종료 시간 기록

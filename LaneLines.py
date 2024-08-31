@@ -172,6 +172,7 @@ class LaneLines:
             miny = min(miny, np.min(righty))
 
         ploty = np.linspace(miny, maxy, img.shape[0])
+        y = ploty
         # print(f"self.left_fit: {self.left_fit}")
         # print(f"ploty: {ploty}")
         left_fitx = self.left_fit[0] * ploty ** 2 + self.left_fit[1] * ploty + self.left_fit[2]
@@ -259,5 +260,5 @@ class LaneLines:
 
         road_info = [radius_of_curvature, road_info, deviation_state, steering_angle, deviation]
         print(road_info)
-        return out_img2, road_info
+        return out_img2, road_info, left_fitx, right_fitx, y
         
